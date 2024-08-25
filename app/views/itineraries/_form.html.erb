@@ -1,0 +1,29 @@
+<!-- this form is to get the user preferences like destination, duration, interest, budget -->
+<!-- the form is a post request to the create action in the itineraries controller -->
+
+<%= form_with url: itineraries_path, method: :post, class:"max-w-[800px] w-full" do |f| %>
+  <div class="flex justify-between">
+    <%= f.label :destination, 'Choose your destination' %>
+    <%= f.select :destination, @destinations.collect { |d| [d.name, d.id] } %>
+  </div>
+
+  <div class="flex justify-between">
+    <%= f.label :duration, 'Duration (in days)' %>
+    <%= f.number_field :duration, min: 1, max: 4 %>
+  </div>
+
+  <div class="flex justify-between">
+    <%= f.label :interest, 'What are you interested in?' %>
+    <%= f.text_field :interest %>
+  </div>
+
+  <div class="flex justify-between">
+    <%= f.label :budget, 'Budget (in USD)' %>
+    <%= f.number_field :budget %>
+  </div>
+
+  <div class="flex justify-between">
+    <%= f.submit 'Create Itinerary', class: "bg-black text-white p-4 cursor-pointer" %>
+  </div>
+<% end %>
+
