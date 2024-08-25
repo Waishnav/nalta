@@ -4,11 +4,17 @@ class ItinerariesController < ApplicationController
   end
 
   def create
+    @itinerary = Itinerary.new(itinerary_params)
+    if @itinerary.save
+      redirect_to @itinerary, notice: 'Itinerary created successfully.'
+    else
+      render :index, status: :unprocessable_entity
+    end
   end
 
   private
 
-  def itinerary_params 
-    params.require(:itinerary).permit(:name, :description, :start_date, :end_date, :destination_id)
+  def itinerary_params
+    params.require(:itinerary).permit(:destination_id, :duration, :interest, :budget)
   end
 end
