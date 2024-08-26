@@ -2,5 +2,5 @@ class Place < ApplicationRecord
   belongs_to :destination
   has_many :activities
 
-  enum category: { hotel: 0, restaurant: 1, attraction: 2, landmark: 3, park: 4, museum: 5, other: 6 }
+  enum category: { attraction: 0, landmark: 1, park: 2, museum: 3, nightlife: 4, shopping: 5, food: 6 }
 end

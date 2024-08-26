@@ -1,0 +1,25 @@
+1. google api for places query
+2. pseudo algorigthm
+  a. query based on intrest
+  b. clustering based on lattitude and longitude
+  c. period of the day
+  d. budget (median of whole data)
+
+3. interest
+
+* pseudo algorithm
+1. check whether that destination exist in our db or not
+2. if not,
+  a. get the lattitude and longitude of destination from mapbox api
+  b. using lattitude and longitude, get the places from mapbox api
+  c. places will be fetch on the basis of interest
+
+3. if yes
+  a. get the places in that destination from our db with filter of interest
+  b. clustering the places on the basis of lattitude and longitude (array of clusters)
+  c. now we have array of clusters, we will select the cluster on the basis of period of the day
+  d. number of clusters = no of days of trip
+  e. assigning each itinary to each day
+    1. user's interest such as adventure, historical, night-life, etc
+    2. so certain interest are meant to do in certain period of the day (after sunrise, after sunset, afternoon, night)
+
