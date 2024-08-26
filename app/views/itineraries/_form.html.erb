@@ -7,20 +7,31 @@
     <%= f.select :destination, @destinations.collect { |d| [d.name, d.id] } %>
   </div>
 
+<!--
   <div class="flex justify-between">
     <%= f.label :duration, 'Duration (in days)' %>
     <%= f.number_field :duration, min: 1, max: 4 %>
   </div>
+-->
 
   <div class="flex justify-between">
     <%= f.label :interest, 'What are you interested in?' %>
-    <%= f.text_field :interest %>
+    <div class="flex flex-col">
+    <% @interests.each do |interest| %>
+      <div class="flex items-center">
+        <%= f.check_box :interest_ids, { multiple: true }, interest, nil %>
+        <%= f.label :interest_ids, interest %>
+      </div>
+    <% end %>
+    </div>
   </div>
 
+<!--
   <div class="flex justify-between">
     <%= f.label :budget, 'Budget (in USD)' %>
     <%= f.number_field :budget %>
   </div>
+-->
 
   <div class="flex justify-between">
     <%= f.submit 'Create Itinerary', class: "bg-black text-white p-4 cursor-pointer" %>
