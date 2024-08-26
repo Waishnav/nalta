@@ -14,10 +14,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
   create_table "activities", force: :cascade do |t|
     t.integer "place_id"
     t.string "name"
-    t.text "description"
-    t.integer "average_time_spent"
-    t.decimal "latitude", precision: 10, scale: 8
-    t.decimal "longitude", precision: 11, scale: 8
+    t.decimal "average_time_spent", precision: 4, scale: 2
     t.integer "category"
     t.decimal "cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
@@ -27,7 +24,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
 
   create_table "destinations", force: :cascade do |t|
     t.string "name", default: "", null: false
-    t.text "description", default: "", null: false
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
     t.string "country"
@@ -35,6 +31,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
     t.decimal "avg_food_cost_per_meal", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_destinations_on_name", unique: true
   end
 
   create_table "places", force: :cascade do |t|
@@ -42,9 +39,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
     t.string "name"
-    t.text "description"
     t.integer "category"
-    t.integer "average_time_spent"
+    t.decimal "average_time_spent", precision: 4, scale: 2
     t.time "opening_hours"
     t.time "closing_hours"
     t.decimal "min_cost", precision: 10, scale: 2
