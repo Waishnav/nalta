@@ -7,12 +7,10 @@
     <%= f.select :destination, @destinations.collect { |d| [d.name, d.id] } %>
   </div>
 
-<!--
   <div class="flex justify-between">
-    <%= f.label :duration, 'Duration (in days)' %>
-    <%= f.number_field :duration, min: 1, max: 4 %>
+    <%= f.label :num_days, 'Duration (in days)' %>
+    <%= f.number_field :num_days, min: 1, max: 4 %>
   </div>
--->
 
   <div class="flex justify-between">
     <%= f.label :interest, 'What are you interested in?' %>
