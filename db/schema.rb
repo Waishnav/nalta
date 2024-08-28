@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
+ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
   create_table "activities", force: :cascade do |t|
     t.integer "place_id"
     t.string "name"
@@ -22,16 +22,33 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
     t.index ["place_id"], name: "index_activities_on_place_id"
   end
 
+  create_table "countries", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_countries_on_name", unique: true
+  end
+
   create_table "destinations", force: :cascade do |t|
     t.string "name", default: "", null: false
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
-    t.string "country"
+    t.integer "country_id", null: false
     t.decimal "avg_transportation_cost_per_km", precision: 10, scale: 2
     t.decimal "avg_food_cost_per_meal", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["country_id"], name: "index_destinations_on_country_id"
     t.index ["name"], name: "index_destinations_on_name", unique: true
+  end
+
+  create_table "place_best_times", force: :cascade do |t|
+    t.integer "place_id", null: false
+    t.integer "best_time_to_visit", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id"], name: "index_place_best_times_on_place_id"
   end
 
   create_table "places", force: :cascade do |t|
@@ -39,10 +56,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
     t.string "name"
-    t.integer "category"
     t.decimal "average_time_spent", precision: 4, scale: 2
-    t.time "opening_hours"
-    t.time "closing_hours"
     t.decimal "min_cost", precision: 10, scale: 2
     t.decimal "max_cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
@@ -50,6 +64,17 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_25_140014) do
     t.index ["destination_id"], name: "index_places_on_destination_id"
   end
 
+  create_table "point_of_interests", force: :cascade do |t|
+    t.integer "place_id", null: false
+    t.integer "category", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id"], name: "index_point_of_interests_on_place_id"
+  end
+
   add_foreign_key "activities", "places"
+  add_foreign_key "destinations", "countries"
+  add_foreign_key "place_best_times", "places"
   add_foreign_key "places", "destinations"
+  add_foreign_key "point_of_interests", "places"
 end
