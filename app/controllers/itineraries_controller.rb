@@ -1,7 +1,7 @@
 class ItinerariesController < ApplicationController
   def index
     @destinations = Destination.all
-    @interests = Place.categories.keys
+    @interests = PointOfInterest.categories.keys.map(&:humanize)
   end
 
   def create

@@ -1,3 +1,2 @@
-<h1 class="text-3xl font-mono font-semibold my-8">Create Your Itinerary</h1>
-<%= react_component "CreateItenariesForm", message: "Hello React!" %>
+<%= react_component("CreateItenariesForm", { authenticity_token: form_authenticity_token, destinations: @destinations.as_json, interests: @interests.as_json }) %>
 <%# = render 'form' %>
