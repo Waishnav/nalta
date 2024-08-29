@@ -53,18 +53,42 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     }
   };
 
+  console.log(duration)
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (active < 3) {
+      setActive((prev) => prev + 1);
+    } else {
+      fetch('/itineraries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': authenticity_token
+        },
+
+        body: JSON.stringify({
+          destination: selectedDestination,
+          latitude: latitude,
+          longitude: longitude,
+          interest_ids: selectedInterests,
+          num_days: duration
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          setItineraries(data.itineraries);
+          setActive((prev) => prev + 1);
+        });
+    }
+  };
   const renderForm = () => (
     <form
-      onSubmit={() => {
-        setActive((prev) => prev + 1);
-      }}
-      action="/itineraries" method="post"
       className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full"
     >
-      <input type="hidden" name="authenticity_token" value={authenticity_token} />
       {active === 1 && (
         <>
-          <label htmlFor="destination" className="font-semibold text-4xl py-4">
+          <label htmlFor="destination" className="font-semibold text-center text-4xl py-4">
             Where do you want to go?
           </label>
           <Select
@@ -86,7 +110,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
 
       {active === 2 && (
         <>
-          <label className="font-semibold text-4xl py-4">
+          <label className="font-semibold text-4xl text-center py-4">
             How many days of trip?
           </label>
           <Slider
@@ -111,7 +135,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
 
       {active === 3 && (
         <>
-          <label className="font-semibold text-4xl py-4">
+          <label className="font-semibold text-4xl text-center py-4">
             Tell us what you’re interested in
           </label>
           <Chip.Group
@@ -156,7 +180,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
           Back
         </Button>
         {active === 3 ? (
-          <Button color="teal.5" size="md">
+          <Button onClick={handleSubmit} color="teal.5" size="md">
             Submit
           </Button>
         ) : (

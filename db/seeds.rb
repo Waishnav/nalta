@@ -67,8 +67,6 @@ def determine_best_time(category)
     [:morning, :evening]
   when :art
     [:morning, :afternoon, :evening]
-  when :viewpoint
-    [:morning, :evening]
   when :animal_shelter, :zoo, :aquarium
     [:morning, :afternoon]
   when :water_park
@@ -79,6 +77,41 @@ def determine_best_time(category)
     [:morning, :afternoon]
   else
     [:morning, :afternoon, :evening]
+  end
+end
+
+def determine_best_time_and_duration(category)
+  case category.to_sym
+  when :beach, :lake
+    { best_times: [:morning, :evening], average_time_spent: 2.0 }
+  when :shopping_mall
+    { best_times: [:afternoon, :evening], average_time_spent: 2.5 }
+  when :art_gallery, :museum
+    { best_times: [:afternoon], average_time_spent: 1.5 }
+  when :landscaping, :park, :nature_reserve
+    { best_times: [:morning, :afternoon], average_time_spent: 1.5 }
+  when :nightlife, :nightclub
+    { best_times: [:night], average_time_spent: 3.0 }
+  when :entertainment
+    { best_times: [:afternoon, :evening, :night], average_time_spent: 2.5 }
+  when :tourist_attraction, :historic_site, :monument
+    { best_times: [:morning, :afternoon], average_time_spent: 2.0 }
+  when :temple
+    { best_times: [:morning, :evening], average_time_spent: 1.0 }
+  when :art
+    { best_times: [:morning, :afternoon, :evening], average_time_spent: 1.5 }
+  when :viewpoint
+    { best_times: [:morning, :evening], average_time_spent: 1.0 }
+  when :animal_shelter, :zoo, :aquarium
+    { best_times: [:morning, :afternoon], average_time_spent: 3.0 }
+  when :water_park
+    { best_times: [:afternoon], average_time_spent: 4.0 }
+  when :climbing, :cave
+    { best_times: [:morning, :afternoon], average_time_spent: 2.5 }
+  when :waterfall
+    { best_times: [:morning, :afternoon], average_time_spent: 1.5 }
+  else
+    { best_times: [:morning, :afternoon, :evening], average_time_spent: 2.0 }
   end
 end
 
@@ -115,19 +148,24 @@ def fetch_places_details(destination, country, poi)
       mapped_category = category_mapping[category_downcase] || category_downcase
 
       if PointOfInterest.categories.key?(mapped_category.to_sym)
-        PointOfInterest.find_or_create_by(
+        point_of_interest = PointOfInterest.find_or_create_by(
           place: place,
           category: mapped_category
         )
-      end
 
-      best_times = determine_best_time(mapped_category)
+        best_time_and_duration = determine_best_time_and_duration(mapped_category)
+        
+        # Update the place's average_time_spent if it's not set or if the new value is greater
+        if place.average_time_spent.nil? || best_time_and_duration[:average_time_spent] > place.average_time_spent
+          place.update(average_time_spent: best_time_and_duration[:average_time_spent])
+        end
 
-      best_times.each do |best_time|
-        PlaceBestTime.find_or_create_by(
-          place: place,
-          best_time_to_visit: best_time
-        )
+        best_time_and_duration[:best_times].each do |best_time|
+          PlaceBestTime.find_or_create_by(
+            place: place,
+            best_time_to_visit: best_time
+          )
+        end
       end
     end
 
