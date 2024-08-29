@@ -10,7 +10,8 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [duration, setDuration] = useState(1);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  console.log(selectedInterests)
+  const [showResults, setShowResults] = useState(false)
+  const [itineraries, setItineraries] = useState([]);
 
   const MAPBOX_TOKEN = 'pk.eyJ1IjoidmFpc2huYXY3NiIsImEiOiJjbTBjZmY1eDgwMjVwMmpyNDJmMmZxMHI4In0.N3L7x-R9iV2yUwKMi3jXkw'; // Replace with your Mapbox access token
 
@@ -53,8 +54,6 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     }
   };
 
-  console.log(duration)
-
   const handleSubmit = (event) => {
     event.preventDefault();
     if (active < 3) {
@@ -79,9 +78,11 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
         .then(data => {
           setItineraries(data.itineraries);
           setActive((prev) => prev + 1);
+          setShowResults(true);
         });
     }
   };
+
   const renderForm = () => (
     <form
       className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full"
@@ -198,15 +199,69 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     </form>
   )
 
+  // itineraries contains the list of itineraries of each day array of array(days) of places
+  const renderResults = () => (
+  <>
+    <div className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full">
+      <label className="font-semibold text-4xl text-center py-4">
+        Here are some itineraries for you
+      </label>
+
+      {itineraries.map((day, dayIndex) => (
+        <div key={dayIndex} className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full">
+          <label className="font-semibold text-2xl text-center py-4">
+            Day {dayIndex + 1}
+          </label>
+          
+          <table className="table-auto w-full">
+            <thead>
+              <tr>
+                <th className="px-4 py-2 text-left">Place</th>
+                <th className="px-4 py-2 text-left">Start Time</th>
+                <th className="px-4 py-2 text-left">End Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {day.map((activity, activityIndex) => (
+                <tr key={activityIndex}>
+                  <td className="border px-4 py-2">
+                    {typeof activity.place === 'string' ? activity.place : activity.place.name}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {new Date(activity.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                  <td className="border px-4 py-2">
+                    {new Date(activity.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ))}
+    </div>
+  </>
+);
+
   return (
     <MantineProvider>
       <div className="flex flex-col h-screen">
-        <div className="flex justify-center mt-8">
-          <Progress color="black" value={(active) * 100 / 3} w={900} />
-        </div>
-        <div className="flex flex-grow items-center justify-center">
-          {renderForm()}
-        </div>
+        {showResults ? (
+          <>
+            <div className="flex flex-grow items-center mt-8 justify-center">
+              {renderResults()}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="flex justify-center mt-8">
+              <Progress color="black" value={(active) * 100 / 3} w={900} />
+            </div>
+            <div className="flex flex-grow items-center justify-center">
+              {renderForm()}
+            </div>
+          </>
+        )}
       </div>
     </MantineProvider>
   );

@@ -46,7 +46,7 @@ def fetch_destination_details(destination_name, country)
     country: feature['context'].find { |c| c['id'].start_with?('country') }&.dig('text')
   }
 end
- 
+
 def determine_best_time(category)
   case category.to_sym
   when :beach, :lake
@@ -83,15 +83,15 @@ end
 def determine_best_time_and_duration(category)
   case category.to_sym
   when :beach, :lake
-    { best_times: [:morning, :evening], average_time_spent: 2.0 }
+    { best_times: [:morning, :evening], average_time_spent: 1.5 }
   when :shopping_mall
-    { best_times: [:afternoon, :evening], average_time_spent: 2.5 }
+    { best_times: [:afternoon, :evening], average_time_spent: 2.0 }
   when :art_gallery, :museum
     { best_times: [:afternoon], average_time_spent: 1.5 }
-  when :landscaping, :park, :nature_reserve
+  when :park, :nature_reserve
     { best_times: [:morning, :afternoon], average_time_spent: 1.5 }
   when :nightlife, :nightclub
-    { best_times: [:night], average_time_spent: 3.0 }
+    { best_times: [:night], average_time_spent: 2.0 }
   when :entertainment
     { best_times: [:afternoon, :evening, :night], average_time_spent: 2.5 }
   when :tourist_attraction, :historic_site, :monument
@@ -99,11 +99,9 @@ def determine_best_time_and_duration(category)
   when :temple
     { best_times: [:morning, :evening], average_time_spent: 1.0 }
   when :art
-    { best_times: [:morning, :afternoon, :evening], average_time_spent: 1.5 }
-  when :viewpoint
-    { best_times: [:morning, :evening], average_time_spent: 1.0 }
+    { best_times: [:morning, :afternoon, :evening], average_time_spent: 1.0 }
   when :animal_shelter, :zoo, :aquarium
-    { best_times: [:morning, :afternoon], average_time_spent: 3.0 }
+    { best_times: [:morning, :afternoon], average_time_spent: 2.0 }
   when :water_park
     { best_times: [:afternoon], average_time_spent: 4.0 }
   when :climbing, :cave
@@ -111,7 +109,7 @@ def determine_best_time_and_duration(category)
   when :waterfall
     { best_times: [:morning, :afternoon], average_time_spent: 1.5 }
   else
-    { best_times: [:morning, :afternoon, :evening], average_time_spent: 2.0 }
+    { best_times: [:morning, :afternoon, :evening], average_time_spent: 1.0 }
   end
 end
 
@@ -154,7 +152,6 @@ def fetch_places_details(destination, country, poi)
         )
 
         best_time_and_duration = determine_best_time_and_duration(mapped_category)
-        
         # Update the place's average_time_spent if it's not set or if the new value is greater
         if place.average_time_spent.nil? || best_time_and_duration[:average_time_spent] > place.average_time_spent
           place.update(average_time_spent: best_time_and_duration[:average_time_spent])
@@ -175,9 +172,9 @@ end
 
 # Destinations
 destinations = [
-  { name: "Mumbai", country: "India" },
+  #{ name: "Mumbai", country: "India" },
+  { name: "Mumbai City", country: "India" },
   #{ name: "New Delhi", country: "India" },
-  #{ name: "Nashik", country: "India" }, 
   #{ name: "Pune", country: "India" },
   #{ name: "Nagpur", country: "India" },
   #{ name: "Goa", country: "India" },

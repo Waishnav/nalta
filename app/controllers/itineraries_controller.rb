@@ -10,11 +10,22 @@ class ItinerariesController < ApplicationController
     interest_ids = params[:interest_ids]
     num_days = params[:num_days].to_i
 
+    #data_fetcher = DataFetcherService.new(
+    #  params[:destination],
+    #  "India",
+    #  params[:latitude],
+    #  params[:longitude],
+    #  params[:interest_ids]
+    #)
+
     # Find or create the destination
     @destination = Destination.find_or_create_by(name: destination) do |dest|
       dest.latitude = latitude
       dest.longitude = longitude
     end
+
+    # if destination is not found, we first fetch it from mapbox database through their API
+    #@destination = data_fetcher.call
 
     # Filter places based on interests and location
     @places = Place.where(destination: @destination)
@@ -26,8 +37,9 @@ class ItinerariesController < ApplicationController
     clustering_service = PlaceClusteringService.new(@places, num_days)
     @clustered_places = clustering_service.cluster
 
+    interest_categories = interest_ids.map { |id| PointOfInterest.categories.key(id.to_i) }
     @itineraries = @clustered_places.map.with_index do |cluster, day|
-      generate_and_assign_time_blocks(places: cluster)
+      generate_and_assign_time_blocks(places: cluster, interests: interest_categories)
     end
 
     render json: { itineraries: @itineraries }
@@ -43,8 +55,7 @@ class ItinerariesController < ApplicationController
   # evening = 5pm - 7pm
   ## dinner = 7pm - 8pm
   # night = 8pm - 12am
-
-  def generate_and_assign_time_blocks(places:)
+  def generate_and_assign_time_blocks(places:, interests:)
     time_slots = {
       dawn: { start: Time.new(2000, 1, 1, 6, 0, 0), end: Time.new(2000, 1, 1, 8, 0, 0) },
       morning: { start: Time.new(2000, 1, 1, 9, 0, 0), end: Time.new(2000, 1, 1, 12, 0, 0) },
@@ -60,19 +71,24 @@ class ItinerariesController < ApplicationController
     }
 
     itinerary = []
+
+    visited_place_id = Set.new
     visited_categories = Set.new
 
-    # Helper method to find the best place for a given time slot
+    # for each time slot, query places and then in these places array,
+    # iterate over each interest and assign the place to visit and time slot in that time slot
+    # we have to move to another interest after assigning atleast one place to each interest
+    # we have to keep track of visited places
+
     def find_best_place(places, time_slot, visited_categories, available_time)
       places.select { |place| place.place_best_times.map(&:best_time_to_visit).include?(time_slot.to_s) }
             .select { |place| place.average_time_spent <= available_time }
-            .sort_by { |place| [visited_categories.include?(place.point_of_interests.first.category) ? 1 : 0, -place.average_time_spent] }
+            #.sort_by { |place| [visited_categories.intersect?(place.point_of_interests.pluck(:category)) ? 1 : 0, -place.average_time_spent] }
             .first
     end
 
-    # Assign places to time slots
     time_slots.each do |slot, time|
-      slot_duration = (time[:end] - time[:start]) / 3600.0 # Convert to hours
+      slot_duration = (time[:end] - time[:start]) / 3600.0
       remaining_time = slot_duration
 
       while remaining_time > 0 && !places.empty?
@@ -83,26 +99,29 @@ class ItinerariesController < ApplicationController
         start_time = time[:start] + (slot_duration - remaining_time) * 3600
         end_time = start_time + visit_duration * 3600
 
+        # Get all categories for the place and filter by user interests
+        place_categories = place.point_of_interests.pluck(:category)
+        relevant_categories = place_categories & interests
+
         itinerary << {
           place: place,
           start_time: start_time,
           end_time: end_time,
-          category: place.point_of_interests.first.category
+          category: place_categories
         }
 
-        visited_categories.add(place.point_of_interests.first.category)
+        visited_categories.merge(relevant_categories)
         places.delete(place)
         remaining_time -= visit_duration
       end
     end
 
-    # Add meals to the itinerary
     meals.each do |meal, time|
       itinerary << {
-        place: "Find a place for #{meal}",
+        place: meal.to_s,
         start_time: time[:start],
         end_time: time[:end],
-        category: meal
+        category: meal.to_s
       }
     end
 

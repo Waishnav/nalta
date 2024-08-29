@@ -37,3 +37,20 @@ interests = [
 * what mapbox endpoint to lookup?
 1. for searching over place and getting destination info: https://api.mapbox.com/geocoding/v5/mapbox.places/mumbai,india.json?access_token=pk.eyJ1IjoidmFpc2huYXY3NiIsImEiOiJjbTBjanVpdzkwM3p6Mmlxc25ha3lyZ21mIn0.vWhWfnAEsvZ2MUMRgo0u0w&types=place&limit=1
 2. iterating over each interests that user has given: https://api.mapbox.com/geocoding/v5/mapbox.places/lake%2C%20shopping_mall%2C%20art_gallery%2C%20landscaping%2C%20nightlife%2C%20entertainment%2C%20park%2C%20tourist_attraction%2C%20historic_site%20in%20mumbai.json?country=in&limit=10&proximity=72.87872%2C19.077793&types=poi&access_token=pk.eyJ1IjoidmFpc2huYXY3NiIsImEiOiJjbTBjanVpdzkwM3p6Mmlxc25ha3lyZ21mIn0.vWhWfnAEsvZ2MUMRgo0u0w
+
+What's next?
+1. searching using mapbox api and rendering select serchable input
+2. handeling this request
+
+
+
+
+
+
+
+New Todo:
+
+1. migrate from sqlite to postgres for better performance
+2. updating seed file for postgres
+3. updating the query for fetching places from db
+4. updating algorithm to assign places/itenaries to each day
