@@ -1,7 +1,7 @@
 class CreatePlaces < ActiveRecord::Migration[7.1]
   def change
     create_table :places do |t|
-      t.references :destination, foreign_key: true
+      t.references :destination, foreign_key: true, null: false
       t.decimal :latitude, precision: 10, scale: 8
       t.decimal :longitude, precision: 11, scale: 8
       t.string :name, null: false
