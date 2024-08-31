@@ -10,16 +10,23 @@ class PointOfInterest < ApplicationRecord
     entertainment: 5,
     park: 6,
     tourist_attraction: 7,
-    historic_site: 8,
-    temple: 9,
+    historical_landmark: 8,
+    religious_places: 9,
     monument: 10,
-    animal_shelter: 11,
-    nature_reserve: 12,
-    water_park: 13,
-    zoo: 14,
-    aquarium: 15,
-    climbing: 16,
-    cave: 17,
-    waterfall: 18
+    nature_reserve: 11,
+    water_park: 12,
+    zoo: 13,
+    aquarium: 14,
+    hiking: 15,
+    cave: 16,
+    waterfall: 17
   }
 end
+
+# nightlife =  casino, night_club, bar, pub
+# adventure = hiking_area, climbing_area, waterfall,
+# fun = bowling_alley, amusement_park, water_park, zoo, aquarium
+# park = amusement_park, amusement_center, 
+# religious_places = temple, church, mosque
+# shopping = shopping_mall, market
+# 

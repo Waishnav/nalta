@@ -1,6 +1,8 @@
-import { Button, Chip, Group, Input, MantineProvider, Progress, Select, Slider } from "@mantine/core";
-import '@mantine/dates/styles.css';
-import React, { useState } from "react";
+import { Badge, Button, Chip, Group, MantineProvider, Progress, SegmentedControl, Select, Slider, Text, Timeline } from "@mantine/core";
+import React, { useEffect, useRef, useState } from "react";
+import ItineraryMap from "./Map";
+import { MapPinIcon, UtensilsIcon } from "lucide-react";
+const DEBOUNCE_DELAY = 100;
 
 const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [active, setActive] = useState(1);
@@ -12,17 +14,30 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [showResults, setShowResults] = useState(false)
   const [itineraries, setItineraries] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const abortControllerRef = useRef(null);
 
   const MAPBOX_TOKEN = 'pk.eyJ1IjoidmFpc2huYXY3NiIsImEiOiJjbTBjZmY1eDgwMjVwMmpyNDJmMmZxMHI4In0.N3L7x-R9iV2yUwKMi3jXkw'; // Replace with your Mapbox access token
 
   const fetchMapboxSuggestions = async (query) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+    const { signal } = abortControllerRef.current;
+
     try {
-      const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&limit=5&country=in`);
+      const response = await fetch(
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&autocomplete=true&limit=5&country=in`,
+        { signal }
+      );
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
       const data = await response.json();
-      console.log(data)
       return data.features.map(feature => ({
         value: feature.text,
         label: feature.text,
@@ -35,14 +50,26 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     }
   };
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (searchQuery.length > 2) {
+        fetchMapboxSuggestions(searchQuery).then(setSuggestions);
+      } else {
+        setSuggestions([]);
+      }
+    }, DEBOUNCE_DELAY);
+
+    return () => {
+      clearTimeout(timeoutId);
+      // Cancel any ongoing request when the component unmounts or when the effect re-runs
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, [searchQuery]);
+
   const handleSearch = async (query) => {
-    if (query.length > 4) { // Trigger search only when input length is greater than 2
-      const results = await fetchMapboxSuggestions(query);
-      console.log(results)
-      setSuggestions(results);
-    } else {
-      setSuggestions([]);
-    }
+    setSearchQuery(query);
   };
 
   const handleSelect = (value) => {
@@ -199,56 +226,107 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     </form>
   )
 
+  const [showDayIndex, setShowDayIndex] = useState(0);
+  const [timelineActiveIndex, setTimelineActiveIndex] = useState(0)
   // itineraries contains the list of itineraries of each day array of array(days) of places
-  const renderResults = () => (
-  <>
-    <div className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full">
-      <label className="font-semibold text-4xl text-center py-4">
-        Here are some itineraries for you
-      </label>
 
-      {itineraries.map((day, dayIndex) => (
-        <div key={dayIndex} className="flex flex-col items-center gap-8 mb-8 max-w-[800px] w-full">
-          <label className="font-semibold text-2xl text-center py-4">
-            Day {dayIndex + 1}
+  const renderResults = () => (
+    <div className="flex h-screen w-full">
+      <div className="w-1/2 overflow-y-auto">
+        <div className="flex flex-col items-center gap-8 mb-8 w-full mx-auto p-4">
+          <label className="font-semibold text-4xl text-center py-4">
+            Here are some itineraries for you
           </label>
-          
-          <table className="table-auto w-full">
-            <thead>
-              <tr>
-                <th className="px-4 py-2 text-left">Place</th>
-                <th className="px-4 py-2 text-left">Start Time</th>
-                <th className="px-4 py-2 text-left">End Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {day.map((activity, activityIndex) => (
-                <tr key={activityIndex}>
-                  <td className="border px-4 py-2">
-                    {typeof activity.place === 'string' ? activity.place : activity.place.name}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {new Date(activity.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </td>
-                  <td className="border px-4 py-2">
-                    {new Date(activity.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="max-w-[400px] w-full">
+            <SegmentedControl
+              value={showDayIndex}
+              withItemsBorders={false}
+              onChange={setShowDayIndex}
+              fullWidth
+              size="md"
+              radius={"xl"}
+              data={itineraries.map((_, index) => ({
+                value: index,
+                label: `Day ${index + 1}`
+              }))}
+            />
+          </div>
+          {itineraries.map((day, dayIndex) => (
+            <div
+              key={dayIndex}
+              className={`flex flex-col gap-8 mb-8 max-w-[400px] w-full ${showDayIndex !== dayIndex ? 'hidden' : ''
+                }`}
+            >
+              <Timeline color="teal.5" active={timelineActiveIndex} bulletSize={32} lineWidth={4}>
+                {day.map((activity, activityIndex) => (
+                  <Timeline.Item
+                    key={activityIndex}
+                    lineVariant="dashed"
+                    bullet={
+                      activity.break? (
+                        <UtensilsIcon
+                          size={20}
+                          className="cursor-pointer"
+                        />
+                      ) : (
+                        <MapPinIcon
+                          size={20}
+                          className="cursor-pointer"
+                          onClick={() => { setTimelineActiveIndex(activityIndex) }}
+                        />
+                      )
+                    }
+                    title={
+                      activity.place? (
+                        <Text fz={24} fw={"bold"} tt={"capitalize"} className="cursor-pointer" size="xl" my={10}
+                          onClick={() => { setTimelineActiveIndex(activityIndex) }}
+                        >
+                          {activity.place.name}
+                        </Text>
+                      ) : (
+                        <Text c="teal.5" fz={"bold"} tt={"capitalize"} size="md" my={16}>
+                          {activity.break}
+                        </Text>
+                      )
+                    }
+                  >
+                    {activity.place && (
+                      <>
+                        <div className="flex items-center flex-grow gap-4">
+                          {activity.category?.map((category, index) => (
+                            <Badge key={index} variant="default" size="lg" radius="xl" className="mr-2">
+                              {category}
+                            </Badge>
+                          ))}
+                        </div>
+                        <Text c={"dimmed"} size="sm" mt={4}>
+                          {activity.place.average_time_spent} hours
+                        </Text>
+                      </>
+                    )}
+                  </Timeline.Item>
+                ))}
+              </Timeline>
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
-  </>
-);
+      </div>
+
+      <div className="w-1/2">
+        <div id="map" className="h-screen">
+          <ItineraryMap showDay={showDayIndex} timelineActiveIndex={timelineActiveIndex} lat={latitude} long={longitude} data={itineraries} />
+        </div>
+      </div>
+    </div >
+  );
+
 
   return (
     <MantineProvider>
       <div className="flex flex-col h-screen">
         {showResults ? (
           <>
-            <div className="flex flex-grow items-center mt-8 justify-center">
+            <div className="flex flex-grow items-center justify-center">
               {renderResults()}
             </div>
           </>

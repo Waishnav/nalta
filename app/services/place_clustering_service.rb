@@ -11,13 +11,14 @@ class PlaceClusteringService
 
     data = @places.map { |place| [place.latitude, place.longitude] }
     k = [@num_days, @places.size].min
-    kmeans = KMeansClusterer.run k, data, labels: @places, runs: 5
+    kmeans = KMeansClusterer.run k, data, labels: @places, runs: 50
 
     clusters = kmeans.clusters.map(&:points)
 
 
     # Rebalance clusters
     rebalance_clusters(clusters)
+    clusters.sort_by!(&:size).reverse!
     clusters.map { |cluster| cluster.map(&:label) }
   end
 
