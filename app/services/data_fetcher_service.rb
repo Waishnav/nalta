@@ -17,17 +17,19 @@ class DataFetcherService
   private
 
   def find_or_create_destination
-    country = Country.find_by(name: @country_name)
+    country = Country.find_by(name: "India")
     destination = Destination.find_by(name: @destination_name)
 
     unless destination
       puts "\n\nCreating destination '#{@destination_name}' with provided details."
 
-      destination = Destination.create(
+      destination = Destination.find_or_create_by(
         name: @destination_name,
         country: country,
         latitude: @latitude,
-        longitude: @longitude
+        longitude: @longitude,
+        avg_transportation_cost_per_km: 20.0,
+        avg_food_cost_per_meal: 200.0
       )
     end
 
