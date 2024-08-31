@@ -11,17 +11,6 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
-  create_table "activities", force: :cascade do |t|
-    t.integer "place_id"
-    t.string "name"
-    t.decimal "average_time_spent", precision: 4, scale: 2
-    t.integer "category"
-    t.decimal "cost", precision: 10, scale: 2
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["place_id"], name: "index_activities_on_place_id"
-  end
-
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "code", null: false
@@ -72,7 +61,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.index ["place_id"], name: "index_point_of_interests_on_place_id"
   end
 
-  add_foreign_key "activities", "places"
   add_foreign_key "destinations", "countries"
   add_foreign_key "place_best_times", "places"
   add_foreign_key "places", "destinations"

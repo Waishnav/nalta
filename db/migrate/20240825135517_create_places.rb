@@ -4,7 +4,7 @@ class CreatePlaces < ActiveRecord::Migration[7.1]
       t.references :destination, foreign_key: true
       t.decimal :latitude, precision: 10, scale: 8
       t.decimal :longitude, precision: 11, scale: 8
-      t.string :name
+      t.string :name, null: false
       t.decimal :average_time_spent, precision: 4, scale: 2 # in hours
       t.decimal :min_cost, precision: 10, scale: 2
       t.decimal :max_cost, precision: 10, scale: 2
@@ -13,5 +13,7 @@ class CreatePlaces < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
+
+    add_index :places, :name, unique: true
   end
 end
