@@ -46,11 +46,18 @@ What's next?
 
 
 
-
-
 New Todo:
 
 1. migrate from sqlite to postgres for better performance
 2. updating seed file for postgres
 3. updating the query for fetching places from db
 4. updating algorithm to assign places/itenaries to each day
+
+
+
+New todo:
+1. updating algo with priority of clusters based on more number of places in that cluster of every interest
+2. ui updates
+  a. timeline, badges, name of the place etc
+  b. showing the places on map
+  c. onclick on the place updating step of timeline and showing it on map (focus shift to that latitude and longitude)

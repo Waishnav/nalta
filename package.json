@@ -8,15 +8,18 @@
     "postcss-simple-vars": "^7.0.1"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets"
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --watch --loader:.js=jsx --loader:.png=file"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^8.0.5",
     "@mantine/core": "^7.12.1",
     "@mantine/hooks": "^7.12.1",
+    "leaflet": "^1.9.4",
     "lodash-es": "^4.17.21",
+    "lucide-react": "^0.436.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
   }
 }
