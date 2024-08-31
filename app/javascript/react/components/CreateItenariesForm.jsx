@@ -38,18 +38,32 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
+
       const data = await response.json();
-      return data.features.map(feature => ({
-        value: feature.text,
-        label: feature.text,
-        latitude: feature.center[1],
-        longitude: feature.center[0],
-      }));
+
+      const uniqueFeatures = new Set();
+      const suggestions = data.features.reduce((acc, feature) => {
+        const value = feature.text;
+        if (!uniqueFeatures.has(value)) {
+          uniqueFeatures.add(value);
+          acc.push({
+            value: value,
+            label: value,
+            latitude: feature.center[1],
+            longitude: feature.center[0],
+          });
+        }
+        return acc;
+      }, []);
+
+      return suggestions;
+
     } catch (error) {
       console.error("Error fetching data from Mapbox", error);
       return [];
     }
   };
+
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -266,7 +280,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                     key={activityIndex}
                     lineVariant="dashed"
                     bullet={
-                      activity.break? (
+                      activity.break ? (
                         <UtensilsIcon
                           size={20}
                           className="cursor-pointer"
@@ -280,7 +294,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                       )
                     }
                     title={
-                      activity.place? (
+                      activity.place ? (
                         <Text fz={24} fw={"bold"} tt={"capitalize"} className="cursor-pointer" size="xl" my={10}
                           onClick={() => { setTimelineActiveIndex(activityIndex) }}
                         >
