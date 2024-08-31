@@ -61,6 +61,7 @@ def determine_best_time(category)
   end
 end
 
+
 def determine_best_time_and_duration(category)
   case category.to_sym
   when :beach, :lake

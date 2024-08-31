@@ -29,7 +29,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["country_id"], name: "index_destinations_on_country_id"
-    t.index ["name"], name: "index_destinations_on_name", unique: true
   end
 
   create_table "place_best_times", force: :cascade do |t|
@@ -44,7 +43,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.integer "destination_id"
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
-    t.string "name"
+    t.string "name", null: false
     t.decimal "average_time_spent", precision: 4, scale: 2
     t.decimal "min_cost", precision: 10, scale: 2
     t.decimal "max_cost", precision: 10, scale: 2

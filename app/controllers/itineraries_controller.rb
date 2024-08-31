@@ -10,21 +10,16 @@ class ItinerariesController < ApplicationController
     interest_ids = params[:interest_ids]
     num_days = params[:num_days].to_i
 
-    #data_fetcher = DataFetcherService.new(
-    #  params[:destination],
-    #  "India",
-    #  params[:latitude],
-    #  params[:longitude],
-    #  params[:interest_ids]
-    #)Baga Beach
+    data_fetcher = DataFetcherService.new(
+      params[:destination],
+      "India",
+      params[:latitude],
+      params[:longitude],
+      params[:interest_ids]
+    )
 
-    # Find or create the destination
-    @destination = Destination.find_or_create_by(name: destination) do |dest|
-      dest.latitude = latitude
-      dest.longitude = longitude
-    end
+    destination, fetched_places = data_fetcher.call
 
-    # Filter places based on interests and location
     @places = Place.where(destination: @destination)
                .joins(:point_of_interests)
                .where(point_of_interests: { category: interest_ids })
