@@ -10,7 +10,5 @@ class CreateDestinations < ActiveRecord::Migration[7.1]
 
       t.timestamps
     end
-
-    add_index :destinations, :name, unique: true
   end
 end

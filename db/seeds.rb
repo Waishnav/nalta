@@ -110,17 +110,12 @@ def fetch_places_details(destination, country, poi)
   data = JSON.parse(response.body)
 
   data['places'].map do |p|
-    place = Place.find_or_initialize_by(
+    place = Place.find_or_create_by(
       destination: destination,
-      name: p['displayName']['text']
+      name: p['displayName']['text'],
+      longitude: p['location']['longitude'],
+      latitude: p['location']['latitude'],
     )
-
-    # Check if the place has already been created with the same attributes
-    unless place.persisted?
-      place.longitude = p['location']['longitude']
-      place.latitude = p['location']['latitude']
-      place.save!
-    end
 
     if PointOfInterest.categories.key?(poi.to_sym)
       point_of_interest = PointOfInterest.find_or_create_by(
@@ -129,7 +124,6 @@ def fetch_places_details(destination, country, poi)
       )
 
       best_time_and_duration = determine_best_time_and_duration(poi)
-
       # Update the place's average_time_spent if it's not set or if the new value is greater
       if place.average_time_spent.nil? || best_time_and_duration[:average_time_spent] > place.average_time_spent
         place.update(average_time_spent: best_time_and_duration[:average_time_spent])
