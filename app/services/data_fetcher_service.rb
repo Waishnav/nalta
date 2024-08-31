@@ -17,7 +17,7 @@ class DataFetcherService
   private
 
   def find_or_create_destination
-    country = Country.find_by(name: "India")
+    country = Country.find_or_create_by(name: "India", code: "in")
     destination = Destination.find_by(name: @destination_name)
 
     unless destination

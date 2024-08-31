@@ -40,7 +40,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
   end
 
   create_table "places", force: :cascade do |t|
-    t.integer "destination_id"
+    t.integer "destination_id", null: false
     t.decimal "latitude", precision: 10, scale: 8
     t.decimal "longitude", precision: 11, scale: 8
     t.string "name", null: false

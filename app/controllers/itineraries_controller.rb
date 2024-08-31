@@ -20,10 +20,12 @@ class ItinerariesController < ApplicationController
 
     destination, fetched_places = data_fetcher.call
 
-    @places = Place.where(destination: @destination)
+    @places = Place.where(destination: destination)
                .joins(:point_of_interests)
                .where(point_of_interests: { category: interest_ids })
                .distinct
+
+    puts "places: #{@places}"
 
     # Cluster places
     clustering_service = PlaceClusteringService.new(@places, num_days)
