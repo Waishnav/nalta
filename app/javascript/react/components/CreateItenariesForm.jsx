@@ -12,7 +12,8 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [duration, setDuration] = useState(1);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
-  const [showResults, setShowResults] = useState(false)
+  const [showResults, setShowResults] = useState(null)
+  const [isFetching, setIsFetching] = useState(false)
   const [itineraries, setItineraries] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -86,6 +87,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     if (active < 3) {
       setActive((prev) => prev + 1);
     } else {
+      setIsFetching(true);
       fetch('/itineraries', {
         method: 'POST',
         headers: {
@@ -106,6 +108,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
           setItineraries(data.itineraries);
           setActive((prev) => prev + 1);
           setShowResults(true);
+          setIsFetching(false);
         });
     }
   };
@@ -123,7 +126,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             rightSection={<></>}
             size="xl"
             radius={"md"}
-            w={800}
+            w={"90%"}
             placeholder="Example: Mumbai"
             onSearchChange={handleSearch}
             onChange={handleSelect}
@@ -156,7 +159,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             min={1}
             max={5}
             radius={"md"}
-            w={800}
+            w={"90%"}
           />
         </>
       )}
@@ -208,7 +211,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
           Back
         </Button>
         {active === 3 ? (
-          <Button onClick={handleSubmit} color="teal.5" size="md">
+          <Button loading={isFetching} loaderProps={{ type: 'dots' }} onClick={handleSubmit} color="teal.5" size="md">
             Submit
           </Button>
         ) : (
@@ -231,9 +234,9 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   // itineraries contains the list of itineraries of each day array of array(days) of places
 
   const renderResults = () => (
-    <div className="flex h-screen w-full">
-      <div className="w-1/2 overflow-y-auto">
-        <div className="flex flex-col items-center gap-8 mb-8 w-full mx-auto p-4">
+    <div className="flex flex-col lg:flex-row h-screen w-full">
+      <div className="w-full lg:w-1/2 overflow-y-auto">
+        <div className="flex flex-col items-center gap-4 lg:gap-8 mb-4 lg:mb-8 w-full mx-auto p-4">
           <label className="font-semibold text-4xl text-center py-4">
             Here are some itineraries for you
           </label>
@@ -312,8 +315,8 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
         </div>
       </div>
 
-      <div className="w-1/2">
-        <div id="map" className="h-screen">
+      <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen">
+        <div id="map" className="h-full">
           <ItineraryMap showDay={showDayIndex} timelineActiveIndex={timelineActiveIndex} lat={latitude} long={longitude} data={itineraries} />
         </div>
       </div>
