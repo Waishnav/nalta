@@ -2,7 +2,7 @@ import { Badge, Button, Chip, Group, MantineProvider, Progress, SegmentedControl
 import React, { useEffect, useRef, useState } from "react";
 import ItineraryMap from "./Map";
 import { MapPinIcon, UtensilsIcon } from "lucide-react";
-const DEBOUNCE_DELAY = 100;
+const DEBOUNCE_DELAY = 200;
 
 const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [active, setActive] = useState(1);
@@ -16,6 +16,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [isFetching, setIsFetching] = useState(false)
   const [itineraries, setItineraries] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isValidDestination, setIsValidDestination] = useState(false)
 
   const abortControllerRef = useRef(null);
 
@@ -83,6 +84,12 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     };
   }, [searchQuery]);
 
+  useEffect(() => {
+    // Validate selected destination against suggestions
+    const isValid = suggestions.some(suggestion => suggestion.value === selectedDestination);
+    setIsValidDestination(isValid);
+  }, [selectedDestination, suggestions]);
+
   const handleSearch = async (query) => {
     setSearchQuery(query);
   };
@@ -148,6 +155,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             data={suggestions}
             checkIconPosition="right"
             searchable
+            error={!isValidDestination && selectedDestination !== "" ? "Please select a valid destination" : ""}
             required
           />
         </>
@@ -235,6 +243,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             radius={"md"}
             color="teal.5"
             onClick={() => setActive((prev) => prev + 1)}
+            disabled={active === 1 && !isValidDestination}
           >
             Next
           </Button>
