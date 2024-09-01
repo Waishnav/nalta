@@ -11,6 +11,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [longitude, setLongitude] = useState(0);
   const [duration, setDuration] = useState(1);
   const [selectedInterests, setSelectedInterests] = useState([]);
+  const [interestError, setInterestError] = useState(false)
   const [suggestions, setSuggestions] = useState([]);
   const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [showResults, setShowResults] = useState(null)
@@ -223,8 +224,10 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                     onClick={() => {
                       if (selectedInterests.includes(index)) {
                         setSelectedInterests(selectedInterests.filter((item) => item !== index));
-                      } else {
+                      } else if (selectedInterests.length < 8) {  // Check if less than 8 interests are selected
                         setSelectedInterests([...selectedInterests, index]);
+                      } else if (selectedInterests.length > 8) {  // Check if less than 8 interests are selected
+                        setInterestError(true);
                       }
                     }}
                   >
@@ -232,8 +235,15 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                   </Chip>
                 ))
               }
-            </Group>
+            </Group>hange
           </Chip.Group>
+          {
+            interestError && (
+              <Text c="red.5" size="md" mt={4}>
+                Please select at most 8 interests
+              </Text>
+            )
+          }
         </>
       )}
 
@@ -248,7 +258,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
           Back
         </Button>
         {active === 3 ? (
-          <Button loading={isFetching} loaderProps={{ type: 'dots' }} onClick={handleSubmit} color="teal.5" size="md">
+          <Button disabled={interestError} loading={isFetching} loaderProps={{ type: 'dots' }} onClick={handleSubmit} color="teal.5" size="md">
             Submit
           </Button>
         ) : (
