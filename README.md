@@ -22,14 +22,14 @@
     - Solo or with family
 
 3. What can be our data source? is there any API available which let me access to this data for each and every destination in India?
-  - Mapbox API - results are not good as we needed
-  - Google Place API - results are good but it doesn't provide info about places according to budget, same goes with solo or family option
-  - Ola Geocoding and Places API - didn't able to test it thoroughly cause of timelimit
+      - Mapbox API - results are not good as we needed
+      - Google Place API - results are good but it doesn't provide info about places according to budget, same goes with solo or family option
+      - Ola Geocoding and Places API - didn't able to test it thoroughly cause of timelimit
 
 4. Can SQLite be enough for this solution?
-  - I have not stress test the db in production as of now. TODO: I'll update this section later
-  - PostgreSQL has extensions like PostGIS, which lets you store the geolocation efficiently with some in-built methods to query places according to latitude, longitude
-  - Yes PostgreSQL is best choice, but why not test SQLite? Either way we can migrate it later
+      - I have not stress test the db in production as of now. TODO: I'll update this section later
+      - PostgreSQL has extensions like PostGIS, which lets you store the geolocation efficiently with some in-built methods to query places according to latitude, longitude
+      - Yes PostgreSQL is best choice, but why not test SQLite? Either way we can migrate it later
 
 
  
