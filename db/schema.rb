@@ -10,12 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_01_000948) do
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_countries_on_code"
     t.index ["name"], name: "index_countries_on_name", unique: true
   end
 
@@ -29,6 +30,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["country_id"], name: "index_destinations_on_country_id"
+    t.index ["latitude", "longitude"], name: "index_destinations_on_latitude_and_longitude"
   end
 
   create_table "place_best_times", force: :cascade do |t|
@@ -50,6 +52,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["destination_id"], name: "index_places_on_destination_id"
+    t.index ["name"], name: "index_places_on_name"
   end
 
   create_table "point_of_interests", force: :cascade do |t|
@@ -57,6 +60,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_08_27_212119) do
     t.integer "category", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["category"], name: "index_point_of_interests_on_category"
     t.index ["place_id"], name: "index_point_of_interests_on_place_id"
   end
 
