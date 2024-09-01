@@ -77,12 +77,16 @@ class DataFetcherService
 
   def save_to_db(destination, interest, data)
     data['places'].map do |p|
-      place = Place.find_or_create_by(
+      place = Place.find_by(name: p['displayName']['text'])
+
+      unless place
+      place = Place.create(
         destination: destination,
         name: p['displayName']['text'],
         longitude: p['location']['longitude'],
-        latitude: p['location']['latitude'],
+        latitude: p['location']['latitude']
       )
+    end
 
       if PointOfInterest.categories.key?(interest.to_sym)
         point_of_interest = PointOfInterest.find_or_create_by(
