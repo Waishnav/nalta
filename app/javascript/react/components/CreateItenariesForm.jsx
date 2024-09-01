@@ -344,7 +344,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                           <Text c={"dimmed"} size="md" mt={4}>
                             {activity.place.average_time_spent} hours
                           </Text>
-                          <Rating fractions={10} defaultValue={parseFloat(activity.place.rating)} size="md" />
+                          <Rating fractions={10} readOnly defaultValue={parseFloat(activity.place.rating)} size="md" />
                         </div>
                       </>
                     )}
