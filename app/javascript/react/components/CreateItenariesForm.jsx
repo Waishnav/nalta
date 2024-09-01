@@ -146,30 +146,33 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
           <label htmlFor="destination" className="font-semibold text-center text-4xl py-4">
             Where do you want to go?
           </label>
-          <Select
-            rightSection={
-              <>
-                {
-                  isFetchingSuggestions && (
-                    <Loader size={24} color="teal.5" />
-                  )
-                }
-              </>
-            }
-            size="xl"
-            radius={"md"}
-            w={"90%"}
-            placeholder="Example: Mumbai"
-            onSearchChange={handleSearch}
-            onChange={handleSelect}
-            value={selectedDestination}
-            data={suggestions}
-            checkIconPosition="right"
-            searchable
-            error={!isValidDestination && selectedDestination !== "" ? "Please select a valid destination" : ""}
-            required
-          />
-          <p className="text-lg text-gray-500">Currently tool only support Indian Locations</p>
+          <div className="w-full max-w-[80%]">
+            <Select
+              rightSection={
+                <>
+                  {
+                    isFetchingSuggestions && (
+                      <Loader size={24} color="teal.5" />
+                    )
+                  }
+                </>
+              }
+              size="xl"
+              radius={"md"}
+              w={"100%"}
+              m={"auto"}
+              placeholder="Example: Mumbai"
+              onSearchChange={handleSearch}
+              onChange={handleSelect}
+              value={selectedDestination}
+              data={suggestions}
+              checkIconPosition="right"
+              searchable
+              error={!isValidDestination && selectedDestination !== "" ? "Please select a valid destination" : ""}
+              required
+            />
+            <p className="text-lg mt-3 text-gray-500">Currently tool only support Indian Locations</p>
+          </div>
         </>
       )}
 
