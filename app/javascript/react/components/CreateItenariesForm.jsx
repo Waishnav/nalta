@@ -235,7 +235,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                   </Chip>
                 ))
               }
-            </Group>hange
+            </Group>
           </Chip.Group>
           {
             interestError && (
