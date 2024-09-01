@@ -333,7 +333,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                     }
                     title={
                       activity.place ? (
-                        <Text fz={24} fw={"bold"} tt={"capitalize"} className="cursor-pointer" size="xl" my={10}
+                        <Text fz={24} fw={"bold"} className="cursor-pointer" size="xl" my={10}
                           onClick={() => { setTimelineActiveIndex(activityIndex) }}
                         >
                           {activity.place.name}
