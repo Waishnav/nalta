@@ -1,4 +1,4 @@
-import { Badge, Button, Chip, Group, MantineProvider, Progress, SegmentedControl, Select, Slider, Text, Timeline } from "@mantine/core";
+import { Badge, Button, Chip, Group, Loader, MantineProvider, Progress, SegmentedControl, Select, Slider, Text, Timeline } from "@mantine/core";
 import React, { useEffect, useRef, useState } from "react";
 import ItineraryMap from "./Map";
 import { MapPinIcon, UtensilsIcon } from "lucide-react";
@@ -12,6 +12,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
   const [duration, setDuration] = useState(1);
   const [selectedInterests, setSelectedInterests] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
   const [showResults, setShowResults] = useState(null)
   const [isFetching, setIsFetching] = useState(false)
   const [itineraries, setItineraries] = useState([]);
@@ -65,13 +66,15 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
     }
   };
 
+  useEffect(() => {
+    setIsFetchingSuggestions(false);
+  }, [suggestions]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (searchQuery.length > 2) {
+        setIsFetchingSuggestions(true);
         fetchMapboxSuggestions(searchQuery).then(setSuggestions);
-      } else {
-        setSuggestions([]);
       }
     }, DEBOUNCE_DELAY);
 
@@ -144,7 +147,15 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             Where do you want to go?
           </label>
           <Select
-            rightSection={<></>}
+            rightSection={
+              <>
+                {
+                  isFetchingSuggestions && (
+                    <Loader size={24} color="teal.5" />
+                  )
+                }
+              </>
+            }
             size="xl"
             radius={"md"}
             w={"90%"}
@@ -158,6 +169,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
             error={!isValidDestination && selectedDestination !== "" ? "Please select a valid destination" : ""}
             required
           />
+          <p className="text-lg text-gray-500">Currently tool only support Indian Locations</p>
         </>
       )}
 
