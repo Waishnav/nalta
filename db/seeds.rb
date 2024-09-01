@@ -111,12 +111,16 @@ def fetch_places_details(destination, country, poi)
   data = JSON.parse(response.body)
 
   data['places'].map do |p|
-    place = Place.find_or_create_by(
+    place = Place.find_by(name: p['displayName']['text'])
+
+    unless place
+    place = Place.create(
       destination: destination,
       name: p['displayName']['text'],
       longitude: p['location']['longitude'],
       latitude: p['location']['latitude'],
     )
+    end
 
     if PointOfInterest.categories.key?(poi.to_sym)
       point_of_interest = PointOfInterest.find_or_create_by(

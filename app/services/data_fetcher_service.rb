@@ -84,9 +84,10 @@ class DataFetcherService
         destination: destination,
         name: p['displayName']['text'],
         longitude: p['location']['longitude'],
-        latitude: p['location']['latitude']
+        latitude: p['location']['latitude'],
+        rating: p['rating']
       )
-    end
+      end
 
       if PointOfInterest.categories.key?(interest.to_sym)
         point_of_interest = PointOfInterest.find_or_create_by(

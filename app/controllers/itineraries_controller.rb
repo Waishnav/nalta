@@ -70,6 +70,7 @@ class ItinerariesController < ApplicationController
       # TODO: depending on location of previouly filled itinerary, we can filter places
       places.select { |place| place.place_best_times.map(&:best_time_to_visit).include?(time_slot.to_s) }
             .select { |place| place.point_of_interests.map(&:category).include?(category) }
+            .sort_by { |place| -place.rating.to_f }
             #.sort_by { |place| -place.average_time_spent }
     end
 

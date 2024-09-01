@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_01_000948) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_01_013855) do
   create_table "countries", force: :cascade do |t|
     t.string "name", null: false
     t.string "code", null: false
@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_01_000948) do
     t.decimal "max_cost", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "rating", precision: 3, scale: 2
     t.index ["destination_id"], name: "index_places_on_destination_id"
     t.index ["name"], name: "index_places_on_name"
   end
