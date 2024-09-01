@@ -18,16 +18,9 @@ class ItinerariesController < ApplicationController
       params[:interest_ids]
     )
 
-    destination, fetched_places = data_fetcher.call
+    destination, @places = data_fetcher.call
 
-    @places = Place.where(destination: destination)
-               .joins(:point_of_interests)
-               .where(point_of_interests: { category: interest_ids })
-               .distinct
-
-    puts "places: #{@places}"
-
-    # Cluster places
+    # Cluster places based on location
     clustering_service = PlaceClusteringService.new(@places, num_days)
     @clustered_places = clustering_service.cluster
 
@@ -41,9 +34,6 @@ class ItinerariesController < ApplicationController
 
   private
 
-  # 4hr each
-  #
-  #
   # dawn = 6am - 8am -> 7:30 - 8:30
   ## breakfast = 8am - 9am
   # morning = 9am - 12pm
@@ -53,30 +43,23 @@ class ItinerariesController < ApplicationController
   ## dinner = 7pm - 8pm
   # night = 8pm - 12am
 
-
   def generate_and_assign_time_blocks(places:, interests:)
     time_duration = {
-      dawn: 2,
-      morning: 2,
-      afternoon: 4,
-      evening: 2,
-      night: 2
+      dawn: 2, morning: 2, afternoon: 4, evening: 2, night: 2
     }
+
+    # Preprocess places data
+    places_by_category_and_time = preprocess_places(places, interests)
 
     itinerary = []
     visited_places = Set.new
 
-    def find_best_place_for_category(places, category, time_slot)
-      # TODO: depending on location of previouly filled itinerary, we can filter places
-      places.select { |place| place.place_best_times.map(&:best_time_to_visit).include?(time_slot.to_s) }
-            .select { |place| place.point_of_interests.map(&:category).include?(category) }
-            .sort_by { |place| -place.rating.to_f }
-            #.sort_by { |place| -place.average_time_spent }
+    def find_best_place_for_category(places_data, category, time_slot, visited_places)
+      places_data[category][time_slot].find { |place| !visited_places.include?(place) }
     end
 
-
     time_duration.each do |slot, duration|
-      category_availablity = Hash[interests.map { |item| [item, true] }]
+      category_availability = Hash[interests.map { |item| [item, true] }]
       i = 0
 
       increment_i = lambda do
@@ -85,41 +68,27 @@ class ItinerariesController < ApplicationController
       end
 
       increment_till_next_available_interest = lambda do
-        all_false = category_availablity.each_value.all? { |value| value == false }
-        puts "catgory availablity: #{category_availablity}"
+        all_false = category_availability.values.all?(false)
 
         if all_false
           i = -1
           return
         end
 
-        increment_i.call()
-        while category_availablity[interests[i]] == false
-          increment_i.call()
+        increment_i.call
+        while category_availability[interests[i]] == false
+          increment_i.call
         end
       end
 
-      puts "#{slot} - #{duration}"
-
       while duration > 0 && i != -1
-        puts "i: #{i}, duration: #{duration}"
         interest = interests[i]
 
-        available_places = find_best_place_for_category(places, interest, slot)
-        if available_places.length == 0
-          puts "length 0 available place for #{interest} in #{slot}"
-          category_availablity[interest] = false
-          increment_till_next_available_interest.call()
-          next
-        end
-        unvisited_place = available_places.find do |place|
-          !visited_places.include?(place)
-        end
+        unvisited_place = find_best_place_for_category(places_by_category_and_time, interest, slot, visited_places)
 
         if unvisited_place.nil?
-          puts "no unvisited"
-          category_availablity[interest] = false
-          increment_till_next_available_interest.call()
+          category_availability[interest] = false
+          increment_till_next_available_interest.call
           next
         end
 
@@ -132,22 +101,48 @@ class ItinerariesController < ApplicationController
           visited_places.add(unvisited_place)
           duration -= unvisited_place.average_time_spent
         else
-          puts "duratiton exceed #{interest}"
-          category_availablity[interest] = false
+          category_availability[interest] = false
         end
 
-        increment_till_next_available_interest.call()
+        increment_till_next_available_interest.call
       end
 
-      if slot.to_s == "dawn"
-        itinerary << { break: "breakfast" }
-      elsif slot.to_s == "morning"
-        itinerary << { break: "lunch" }
-      elsif slot.to_s == "evening"
-        itinerary << { break: "dinner" }
-      end
+      itinerary << { break: get_break_for_slot(slot) } if get_break_for_slot(slot)
     end
 
     itinerary
+  end
+
+  def preprocess_places(places, interests)
+    places_data = Hash.new { |h, k| h[k] = Hash.new { |h2, k2| h2[k2] = [] } }
+
+    places.each do |place|
+      place.place_best_times.each do |best_time|
+        slot = best_time.best_time_to_visit.to_sym
+        place.point_of_interests.each do |poi|
+          if interests.include?(poi.category)
+            places_data[poi.category][slot] << place
+          end
+        end
+      end
+    end
+
+    # Sort places by rating for each category and time slot
+    places_data.each do |category, slots|
+      slots.each do |slot, place_list|
+        slots[slot] = place_list.sort_by { |place| -place.rating.to_f }
+      end
+    end
+
+    places_data
+  end
+
+  def get_break_for_slot(slot)
+    case slot
+    when :dawn then "breakfast"
+    when :morning then "lunch"
+    when :evening then "dinner"
+    else nil
+    end
   end
 end
