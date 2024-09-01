@@ -368,7 +368,7 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
 
       <div className="w-full lg:w-1/2 h-[50vh] lg:h-screen">
         <div id="map" className="h-full">
-          <ItineraryMap showDay={showDayIndex} timelineActiveIndex={timelineActiveIndex} lat={latitude} long={longitude} data={itineraries} />
+          <ItineraryMap showDay={showDayIndex} timelineActiveIndex={timelineActiveIndex} setTimelineActiveIndex={setTimelineActiveIndex} lat={latitude} long={longitude} data={itineraries} />
         </div>
       </div>
     </div >

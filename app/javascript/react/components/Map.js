@@ -19,7 +19,7 @@ function ChangeMapView({ center }) {
   return null;
 }
 
-const ItineraryMap = ({ lat, long, timelineActiveIndex, data, showDay }) => {
+const ItineraryMap = ({ lat, long, timelineActiveIndex, setTimelineActiveIndex, data, showDay }) => {
   function calculateMapCenter(itineraries, day) {
     let latSum = 0;
     let lngSum = 0;
@@ -51,7 +51,7 @@ const ItineraryMap = ({ lat, long, timelineActiveIndex, data, showDay }) => {
         parseFloat(dayData[timelineActiveIndex].place.latitude),
         parseFloat(dayData[timelineActiveIndex].place.longitude)
       ]);
-      
+
       // Open the popup for the active timeline item
       const marker = markerRefs.current[timelineActiveIndex];
       if (marker) {
@@ -83,6 +83,11 @@ const ItineraryMap = ({ lat, long, timelineActiveIndex, data, showDay }) => {
               position={[parseFloat(item.place.latitude), parseFloat(item.place.longitude)]}
               icon={customIcon}
               ref={(ref) => markerRefs.current[index] = ref}
+              eventHandlers={{
+                click: () => {
+                  setTimelineActiveIndex(index);
+                },
+              }}
             >
               <Popup>
                 <h3 className="text-2xl font-sans font-semibold">{item.place.name}</h3>
