@@ -1,4 +1,4 @@
-import { Badge, Button, Chip, Group, Loader, MantineProvider, Progress, SegmentedControl, Select, Slider, Text, Timeline } from "@mantine/core";
+import { Badge, Button, Chip, Group, Loader, MantineProvider, Progress, Rating, SegmentedControl, Select, Slider, Text, Timeline } from "@mantine/core";
 import React, { useEffect, useRef, useState } from "react";
 import ItineraryMap from "./Map";
 import { MapPinIcon, UtensilsIcon } from "lucide-react";
@@ -340,9 +340,12 @@ const CreateItenariesForm = ({ authenticity_token, interests }) => {
                             </Badge>
                           ))}
                         </div>
-                        <Text c={"dimmed"} size="sm" mt={4}>
-                          {activity.place.average_time_spent} hours
-                        </Text>
+                        <div className="flex items-center gap-4">
+                          <Text c={"dimmed"} size="md" mt={4}>
+                            {activity.place.average_time_spent} hours
+                          </Text>
+                          <Rating fractions={10} defaultValue={parseFloat(activity.place.rating)} size="md" />
+                        </div>
                       </>
                     )}
                   </Timeline.Item>

@@ -53,7 +53,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_01_013855) do
     t.datetime "updated_at", null: false
     t.decimal "rating", precision: 3, scale: 2
     t.index ["destination_id"], name: "index_places_on_destination_id"
-    t.index ["name"], name: "index_places_on_name"
+    t.index ["name"], name: "index_places_on_name", unique: true
   end
 
   create_table "point_of_interests", force: :cascade do |t|
